@@ -1,0 +1,39 @@
+{
+    "name": "Project",
+    "children": [
+      {
+        "name": "React",
+        "children": [
+          {
+            "name": "auth",
+            "children": [
+              { "name": "custom login/signup" },
+              { "name": "Login with Google" },
+              { "name": "Login with aws/cognito" }
+            ]
+          },
+          { "name": "Dashboard" }
+        ]
+      },
+      {
+        "name": "node",
+        "children": [
+          {
+            "name": "api",
+            "children": [
+              {
+                "name": "/login (POST)",
+                "children": [
+                  { "name": "username - unique" },
+                  { "name": "password - system generated password" },
+                  { "name": "email - employee email" }
+                ]
+              },
+              { "name": "/signup" }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+  
