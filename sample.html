@@ -1,0 +1,104 @@
+x<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3.js Tree Drag-and-Drop</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .node {
+            cursor: pointer;
+        }
+        .node.active {
+            fill: orange;
+        }
+    </style>
+</head>
+<body>
+    <svg width="800" height="600"></svg>
+
+    <script>
+        const data = {
+            name: "Project",
+            children: [
+                {
+                    name: "React",
+                    children: [
+                        { name: "auth" },
+                        { name: "Dashboard" }
+                    ]
+                },
+                {
+                    name: "Node",
+                    children: [
+                        { name: "api" }
+                    ]
+                }
+            ]
+        };
+
+        const svg = d3.select("svg"),
+            width = +svg.attr("width"),
+            height = +svg.attr("height");
+
+        const root = d3.hierarchy(data);
+        const treeLayout = d3.tree().size([width - 200, height - 200]);
+        treeLayout(root);
+
+        svg.append("g")
+            .attr("transform", "translate(100, 50)")
+            .selectAll(".link")
+            .data(root.links())
+            .enter().append("line")
+            .attr("class", "link")
+            .attr("x1", d => d.source.y)
+            .attr("y1", d => d.source.x)
+            .attr("x2", d => d.target.y)
+            .attr("y2", d => d.target.x);
+
+        const nodes = svg.append("g")
+            .attr("transform", "translate(100, 50)")
+            .selectAll(".node")
+            .data(root.descendants())
+            .enter().append("g")
+            .attr("class", "node")
+            .attr("transform", d => `translate(${d.y},${d.x})`)
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+
+        nodes.append("circle")
+            .attr("r", 5)
+            .style("fill", "steelblue");
+
+        nodes.append("text")
+            .attr("dy", 3)
+            .attr("x", d => d.children ? -8 : 8)
+            .style("text-anchor", d => d.children ? "end" : "start")
+            .text(d => d.data.name);
+
+        function dragstarted(event, d) {
+            d3.select(this).raise().classed("active", true);
+        }
+
+        function dragged(event, d) {
+            const newX = d.x = event.y - 50;  // Offset for visual alignment
+            const newY = d.y = event.x - 100; // Offset for visual alignment
+            d3.select(this).attr("transform", `translate(${newY},${newX})`);
+
+            // Update the links
+            svg.selectAll(".link")
+                .attr("x1", (link) => link.source.y)
+                .attr("y1", (link) => link.source.x)
+                .attr("x2", (link) => link.target.y)
+                .attr("y2", (link) => link.target.x);
+        }
+
+        function dragended(event, d) {
+            d3.select(this).classed("active", false);
+        }
+    </script>
+</body>
+</html>
+

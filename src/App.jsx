@@ -28,13 +28,13 @@
 
 
 
-import TreeGraph from "./Components/TreeNode";
+import TreeGraph from './Components/TreeNode'
 
 
 function App() {
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center items-center">
-      <TreeGraph />
+      <TreeGraph/>
     </div>
   );
 }
