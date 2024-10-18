@@ -7,11 +7,10 @@ const ItemType = {
   TEXT: 'text',
 };
 
-
 const DraggableText = ({ textItem, index, onDelete, onTextChange, onMove, onBlur }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemType.TEXT,
-    item: { index, textItem }, // Include textItem to pass its position
+    item: { index },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -19,28 +18,13 @@ const DraggableText = ({ textItem, index, onDelete, onTextChange, onMove, onBlur
 
   const [, drop] = useDrop(() => ({
     accept: ItemType.TEXT,
-    hover: (draggedItem, monitor) => {
-      const delta = monitor.getDifferenceFromInitialOffset(); // Get the change in position
+    hover: (draggedItem) => {
       if (draggedItem.index !== index) {
-        const newX = textItem.x + delta.x; // Calculate new x position
-        const newY = textItem.y + delta.y; // Calculate new y position
-        onMove(draggedItem.index, index, newX, newY); // Pass new position to onMove
+        onMove(draggedItem.index, index);
         draggedItem.index = index; // Update dragged item's index
       }
     },
   }));
-
-  const [isEditing, setIsEditing] = useState(false); // State to track editing mode
-
-  const handleClick = () => {
-    setIsEditing(true); // Switch to editing mode on text click
-  };
-
-  const handleBlur = (e) => {
-    onBlur();
-    setIsEditing(false); // Exit editing mode on blur
-    e.stopPropagation(); // Prevent click from propagating to the canvas
-  };
 
   return (
     <div
@@ -52,40 +36,27 @@ const DraggableText = ({ textItem, index, onDelete, onTextChange, onMove, onBlur
         opacity: isDragging ? 0.5 : 1,
         cursor: 'move',
       }}
-      onClick={(e) => e.stopPropagation()} 
+      onClick={(e) => e.stopPropagation()} // Prevent click from propagating to the canvas
     >
       <div
         onClick={() => onDelete(index)}
-        className="absolute -top-4 -left-4 bg-red-500 text-white p-0 rounded-full cursor-pointer text-xs w-4 h-4 flex items-center justify-center"
+        className="absolute -top-4 -left-4 bg-red-500 text-white p-1 rounded-full cursor-pointer"
       >
         &#x2716; {/* Cross mark for delete icon */}
       </div>
 
-      {/* Conditionally render text or input based on editing state */}
-      {isEditing ? (
-        <input
-          type="text"
-          value={textItem.text}
-          onChange={(e) => onTextChange(index, e.target.value)}
-          onBlur={handleBlur} // Correctly reference the onBlur function
-          autoFocus
-          className="text-base p-2 border border-gray-300 outline-none"
-          style={{ 
-            zIndex: 1,
-          }}
-          placeholder="Type here"
-        />
-      ) : (
-        <div
-          onClick={handleClick} // Click to edit
-          className="text-base p-2"
-          style={{ 
-            zIndex: 1,
-          }}
-        >
-          {textItem.text || 'Click to edit...'} {/* Show the text or a placeholder */}
-        </div>
-      )}
+      <input
+        type="text"
+        value={textItem.text}
+        onChange={(e) => onTextChange(index, e.target.value)}
+        onBlur={onBlur} // Correctly reference the onBlur function
+        autoFocus
+        className="text-base p-2 border border-gray-300 outline-none"
+        style={{ 
+          zIndex: 1,
+        }}
+        placeholder="Type here"
+      />
     </div>
   );
 };
@@ -125,13 +96,13 @@ const Canvas = () => {
   };
 
   const handleBlur = () => {
-    setSelectedTextIndex(null);
+    setSelectedTextIndex(null); 
   };
 
   const handleDelete = (index) => {
-    const updatedTexts = texts.filter((_, i) => i !== index);
+    const updatedTexts = texts.filter((_, i) => i !== index); 
     setTexts(updatedTexts);
-    setSelectedTextIndex(null);
+    setSelectedTextIndex(null); 
   };
 
   const handleMove = (fromIndex, toIndex) => {

@@ -22,7 +22,7 @@
             "name": "api",
             "children": [
               {
-                "name": "/login (POST)",
+                "name": "login /(POST)",
                 "children": [
                   { "name": "username - unique" },
                   { "name": "password - system generated password" },
